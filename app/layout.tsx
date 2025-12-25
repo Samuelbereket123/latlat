@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Game Score Tracker",
+  title: "LatLat",
   description: "Track scores and records for your physical card game sessions",
 };
 

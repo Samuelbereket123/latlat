@@ -33,9 +33,18 @@ export default function GameSetup({ onStartGame }: GameSetupProps) {
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
           እንኳን ደህና መጡ   
         </h1>
-        <p className="text-gray-600 text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+          ቻውቻው በለው ብርህን 😂  
+        </h1>
+
+
+        
+        {/* <p className="text-gray-600 text-center mb-8">
+          ቻውቻው በለው ብርህን 😂
           Track scores for your physical card game
-        </p>
+        </p> */}
+
+        
 
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
