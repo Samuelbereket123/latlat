@@ -31,7 +31,7 @@ export default function GameSetup({ onStartGame }: GameSetupProps) {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl w-full">
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          Game Score Tracker
+          እንኳን ደህና መጡ   
         </h1>
         <p className="text-gray-600 text-center mb-8">
           Track scores for your physical card game

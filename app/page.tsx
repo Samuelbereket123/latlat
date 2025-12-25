@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GameSession, GameHistory as GameHistoryType } from '@/lib/types';
-import { initializeGame, adjustPlayerScore, adjustBankBalance, nextTurn, endSession, saveHistory, loadHistory } from '@/lib/gameLogic';
+import { initializeGame, adjustPlayerScore, adjustBankBalance, nextTurn, endSession, saveHistory, loadHistory, clearHistory } from '@/lib/gameLogic';
 import GameSetup from '@/components/GameSetup';
 import PlayerDisplay from '@/components/PlayerDisplay';
 import BankDisplay from '@/components/BankDisplay';
@@ -41,12 +41,31 @@ export default function Home() {
     if (!session) return;
     const historyEntry = endSession(session);
     saveHistory(historyEntry);
-    setHistory(loadHistory());
+    const updatedHistory = loadHistory();
+    setHistory(updatedHistory);
+    setShowHistory(true); // Open history modal after ending session
     setSession(null);
   };
 
+  const handleClearHistory = () => {
+    clearHistory();
+    setHistory([]);
+    setShowHistory(false);
+  };
+
   if (!session) {
-    return <GameSetup onStartGame={handleStartGame} />;
+    return (
+      <>
+        <GameSetup onStartGame={handleStartGame} />
+        {showHistory && (
+          <GameHistory 
+            history={history} 
+            onClose={() => setShowHistory(false)} 
+            onClear={handleClearHistory}
+          />
+        )}
+      </>
+    );
   }
 
   const currentPlayer = session.players[session.currentPlayerIndex];
@@ -58,7 +77,7 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">Game Score Tracker</h1>
+              <h1 className="text-3xl font-bold text-gray-800">LatLat</h1>
               <p className="text-gray-600 mt-1">
                 Current Turn: <span className="font-semibold text-blue-600">{currentPlayer.name}</span>
               </p>
@@ -125,7 +144,11 @@ export default function Home() {
 
       {/* History Modal */}
       {showHistory && (
-        <GameHistory history={history} onClose={() => setShowHistory(false)} />
+        <GameHistory 
+          history={history} 
+          onClose={() => setShowHistory(false)} 
+          onClear={handleClearHistory}
+        />
       )}
     </div>
   );
