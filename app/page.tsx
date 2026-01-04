@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { GameSession, GameHistory as GameHistoryType } from '@/lib/types';
-import { initializeGame, adjustPlayerScore, adjustBankBalance, nextTurn, endSession, saveHistory, loadHistory, clearHistory } from '@/lib/gameLogic';
+import { initializeGame, adjustPlayerScore, adjustBankBalance, deductFromAll, nextTurn, endSession, saveHistory, loadHistory, clearHistory } from '@/lib/gameLogic';
 import GameSetup from '@/components/GameSetup';
 import PlayerDisplay from '@/components/PlayerDisplay';
 import BankDisplay from '@/components/BankDisplay';
 import ScoreAdjuster from '@/components/ScoreAdjuster';
 import GameHistory from '@/components/GameHistory';
+import GlobalActions from '@/components/GlobalActions';
 
 export default function Home() {
   const [session, setSession] = useState<GameSession | null>(null);
@@ -30,6 +31,11 @@ export default function Home() {
   const handleAdjustBank = (amount: number) => {
     if (!session) return;
     setSession(adjustBankBalance(session, amount));
+  };
+
+  const handleDeductAll = (amount: number) => {
+    if (!session) return;
+    setSession(deductFromAll(session, amount));
   };
 
   const handleNextTurn = () => {
@@ -106,7 +112,7 @@ export default function Home() {
         </div>
 
         {/* Players Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
           {session.players.map((player) => (
             <PlayerDisplay
               key={player.id}
@@ -115,6 +121,9 @@ export default function Home() {
             />
           ))}
         </div>
+
+        {/* Global Actions */}
+        <GlobalActions onDeductAll={handleDeductAll} />
 
         {/* Main Control Area */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">

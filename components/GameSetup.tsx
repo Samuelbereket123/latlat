@@ -51,13 +51,13 @@ export default function GameSetup({ onStartGame }: GameSetupProps) {
             <label className="block text-gray-700 font-semibold mb-2">
               Number of Players
             </label>
-            <div className="flex gap-2">
-              {[2, 3, 4, 5, 6].map(count => (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {[2, 4, 6, 8, 10, 12].map(count => (
                 <button
                   key={count}
                   type="button"
                   onClick={() => handlePlayerCountChange(count)}
-                  className={`flex-1 py-3 rounded font-semibold transition-colors ${
+                  className={`flex-1 min-w-15 py-3 rounded font-semibold transition-colors ${
                     playerCount === count
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -67,13 +67,24 @@ export default function GameSetup({ onStartGame }: GameSetupProps) {
                 </button>
               ))}
             </div>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-600 text-sm font-medium whitespace-nowrap">Custom Count:</span>
+              <input
+                type="number"
+                min="2"
+                max="30"
+                value={playerCount}
+                onChange={(e) => handlePlayerCountChange(parseInt(e.target.value) || 2)}
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           <div className="mb-6">
             <label className="block text-gray-700 font-semibold mb-2">
               Player Names (optional)
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {Array.from({ length: playerCount }).map((_, i) => (
                 <input
                   key={i}

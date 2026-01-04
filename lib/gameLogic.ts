@@ -41,6 +41,19 @@ export function adjustBankBalance(session: GameSession, amount: number): GameSes
   };
 }
 
+export function deductFromAll(session: GameSession, amount: number): GameSession {
+  const updatedPlayers = session.players.map(player => ({
+    ...player,
+    score: player.score - amount,
+  }));
+
+  return {
+    ...session,
+    players: updatedPlayers,
+    bank: session.bank + (amount * session.players.length),
+  };
+}
+
 export function nextTurn(session: GameSession): GameSession {
   return {
     ...session,
