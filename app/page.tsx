@@ -2,17 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { GameSession, GameHistory as GameHistoryType } from '@/lib/types';
-import { initializeGame, adjustPlayerScore, adjustBankBalance, deductFromAll, nextTurn, endSession, saveHistory, loadHistory, clearHistory } from '@/lib/gameLogic';
+import { initializeGame, adjustPlayerScore, adjustBankBalance, deductFromAll, endSession, saveHistory, loadHistory, clearHistory } from '@/lib/gameLogic';
 import GameSetup from '@/components/GameSetup';
 import PlayerDisplay from '@/components/PlayerDisplay';
 import BankDisplay from '@/components/BankDisplay';
 import ScoreAdjuster from '@/components/ScoreAdjuster';
 import GameHistory from '@/components/GameHistory';
 import GlobalActions from '@/components/GlobalActions';
+import TransactionLog from '@/components/TransactionLog';
 
 export default function Home() {
   const [session, setSession] = useState<GameSession | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
   const [history, setHistory] = useState<GameHistoryType[]>([]);
 
   useEffect(() => {
@@ -38,10 +40,6 @@ export default function Home() {
     setSession(deductFromAll(session, amount));
   };
 
-  const handleNextTurn = () => {
-    if (!session) return;
-    setSession(nextTurn(session));
-  };
 
   const handleEndSession = () => {
     if (!session) return;
@@ -74,7 +72,6 @@ export default function Home() {
     );
   }
 
-  const currentPlayer = session.players[session.currentPlayerIndex];
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -84,22 +81,19 @@ export default function Home() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-800">LatLat</h1>
-              <p className="text-gray-600 mt-1">
-                Current Turn: <span className="font-semibold text-blue-600">{currentPlayer.name}</span>
-              </p>
             </div>
             <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogs(true)}
+                className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded hover:bg-indigo-700 transition-colors"
+              >
+                Show Logs
+              </button>
               <button
                 onClick={() => setShowHistory(true)}
                 className="px-4 py-2 bg-gray-600 text-white font-semibold rounded hover:bg-gray-700 transition-colors"
               >
                 View History
-              </button>
-              <button
-                onClick={handleNextTurn}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition-colors"
-              >
-                Next Turn
               </button>
               <button
                 onClick={handleEndSession}
@@ -117,7 +111,6 @@ export default function Home() {
             <PlayerDisplay
               key={player.id}
               player={player}
-              isCurrentPlayer={player.id === currentPlayer.id}
             />
           ))}
         </div>
@@ -138,6 +131,7 @@ export default function Home() {
               key={player.id}
               playerName={player.name}
               currentScore={player.score}
+              bankBalance={session.bank}
               onAdjust={(amount) => handleAdjustScore(player.id, amount)}
             />
           ))}
@@ -150,6 +144,14 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      {/* Logs Modal */}
+      {showLogs && (
+        <TransactionLog 
+          transactions={session.transactions || []} 
+          onClose={() => setShowLogs(false)} 
+        />
+      )}
 
       {/* History Modal */}
       {showHistory && (

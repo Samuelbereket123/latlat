@@ -12,7 +12,32 @@ export function initializeGame(playerCount: number, playerNames: string[]): Game
     players,
     bank: 0,
     startTime: new Date(),
-    currentPlayerIndex: 0,
+    transactions: [],
+  };
+}
+
+function recordTransaction(
+  session: GameSession,
+  type: 'player_adjustment' | 'bank_adjustment' | 'deduct_all' | 'bank_cleared',
+  amount: number,
+  description: string,
+  playerName?: string
+): GameSession {
+  const transaction = {
+    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    timestamp: new Date(),
+    type,
+    amount,
+    newBankBalance: session.bank,
+    description,
+    playerName,
+  };
+
+  const updatedTransactions = [transaction, ...session.transactions].slice(0, 50); // Keep last 50
+
+  return {
+    ...session,
+    transactions: updatedTransactions,
   };
 }
 
@@ -27,18 +52,43 @@ export function adjustPlayerScore(
       : player
   );
 
-  return {
+  const newSession = {
     ...session,
     players: updatedPlayers,
-    bank: session.bank - amount, // Bank moves opposite to player
+    bank: session.bank - amount,
   };
+
+  const playerName = session.players.find(p => p.id === playerId)?.name || 'Unknown';
+  const desc = amount >= 0 
+    ? `${playerName} won $${amount} from the bank` 
+    : `${playerName} lost $${Math.abs(amount)} to the bank`;
+
+  let updatedSession = recordTransaction(newSession, 'player_adjustment', amount, desc, playerName);
+
+  if (updatedSession.bank === 0 && session.bank !== 0) {
+    updatedSession = recordTransaction(updatedSession, 'bank_cleared', 0, 'BANK CLEARED! 🏁', playerName);
+  }
+
+  return updatedSession;
 }
 
 export function adjustBankBalance(session: GameSession, amount: number): GameSession {
-  return {
+  const newSession = {
     ...session,
     bank: session.bank + amount,
   };
+
+  const desc = amount >= 0 
+    ? `Bank increased by $${amount}` 
+    : `Bank decreased by $${Math.abs(amount)}`;
+
+  let updatedSession = recordTransaction(newSession, 'bank_adjustment', amount, desc);
+
+  if (updatedSession.bank === 0 && session.bank !== 0) {
+    updatedSession = recordTransaction(updatedSession, 'bank_cleared', 0, 'BANK CLEARED! 🏁');
+  }
+
+  return updatedSession;
 }
 
 export function deductFromAll(session: GameSession, amount: number): GameSession {
@@ -47,19 +97,24 @@ export function deductFromAll(session: GameSession, amount: number): GameSession
     score: player.score - amount,
   }));
 
-  return {
+  const newSession = {
     ...session,
     players: updatedPlayers,
     bank: session.bank + (amount * session.players.length),
   };
+
+  const total = amount * session.players.length;
+  const desc = `Global deduction: $${amount} from each player (Total Bank +$${total})`;
+
+  let updatedSession = recordTransaction(newSession, 'deduct_all', total, desc);
+
+  if (updatedSession.bank === 0 && session.bank !== 0) {
+    updatedSession = recordTransaction(updatedSession, 'bank_cleared', 0, 'BANK CLEARED! 🏁');
+  }
+
+  return updatedSession;
 }
 
-export function nextTurn(session: GameSession): GameSession {
-  return {
-    ...session,
-    currentPlayerIndex: (session.currentPlayerIndex + 1) % session.players.length,
-  };
-}
 
 export function endSession(session: GameSession): GameHistory {
   return {

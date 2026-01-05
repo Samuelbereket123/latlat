@@ -75,8 +75,8 @@ export default function GameHistory({ history, onClose, onClear }: GameHistoryPr
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
                 {session.players.map((player, pIndex) => (
                   <div key={pIndex} className="bg-gray-50 rounded p-3">
-                    <p className="font-medium text-gray-800">{player.name}</p>
-                    <p className={`text-xl font-bold ${player.finalScore >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <p className="text-lg font-bold text-gray-900 uppercase tracking-tight">{player.name}</p>
+                    <p className={`text-2xl font-black ${player.finalScore >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       ${player.finalScore}
                     </p>
                   </div>
